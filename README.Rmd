@@ -1,3 +1,7 @@
+[Workflow Figure](assets/AMuSA设计图.png)
+![design figure](assets/AMuSA设计图.png)
+
+
 ---
 title: "A Protocol for Signature Assignment Analysis Using AMuSA"
 author: "yy"
