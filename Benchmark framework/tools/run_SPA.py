@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+
+
+from SigProfilerAssignment import Analyzer as Analyze   # https://github.com/AlexandrovLab/SigProfilerAssignment#只能用来SBS，ID和DBS重新写了函数来跑
+#import anlyse as Analyze#单独写了一个函数来处理ID和DBS的数据
+import pandas as pd
+
+
+Analyze.cosmic_fit(samples = 'data/data_for_deconstructSigs.dat', input_type = 'matrix', output = 'signature_results', genome_build = 'GRCh38', cosmic_version = 3, make_plots = False, sample_reconstruction_plots = False)
+df = pd.read_csv('signature_results/Assignment_Solution/Activities/Assignment_Solution_Activities.txt', sep = '\t', index_col = 'Samples').T
+df.to_csv('signature_results/SPA-contribution.dat')
+#!/usr/bin/env python3
+
