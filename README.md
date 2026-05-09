@@ -75,11 +75,11 @@ pip install -e .
 
 ## Usage
 
-AMuSA is an end-to-end mutational signature assignment pipeline. It integrates three internal modules, but runs as a single unified process without requiring step-by-step execution.
+AMuSA is an  mutational signature assignment pipeline. It integrates three internal modules, but runs as a single unified process without requiring step-by-step execution.
 
 ---
 
-## Model Overview (Internal Pipeline)
+## modules  (Internal Pipeline)
 
 Although AMuSA contains three modules, users only need to run one command:
 
@@ -89,12 +89,12 @@ Although AMuSA contains three modules, users only need to run one command:
 - **(2) Signature classification**  
   Estimates the probability of activation for each mutational signature.
 
-- **(3) Channel-weighted NNLS refinement (CW-NNLS)**  
+- **(3) Channel-weighted NNLS refinement (W-NNLS)**  
   Refines signature exposures using channel-aware weighting to reduce bias.
 
 ---
 
-## Run AMuSA (Single Command)
+## Run AMuSA (bash)
 
 ```bash
 python -m AMuSA.main \
@@ -107,7 +107,7 @@ python -m AMuSA.main \
 
 ---
 
-## Python API (Optional)
+## Python  (jupyter notebook)
 
 ```python
 from AMuSA.main import run_pipeline
