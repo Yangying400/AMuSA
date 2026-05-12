@@ -117,16 +117,6 @@ seaborn == 0.13.2
 
 pip install numpy==1.26.4 pandas==2.2.3 scikit-learn==1.5.2 matplotlib==3.10.0 seaborn==0.13.2
 
-# Signature Assignment Analysis
-
-The AMuSA framework performs mutational signature assignment through a two-stage procedure to identify active signatures and estimate their quantitative contributions in each sample.
-
-In the first stage, AMuSA predicts the probability of each mutational signature being active using a trained ensemble model. These probabilities are subsequently converted into binary activation states via thresholding, yielding a set of candidate active signatures.
-
-In the second stage, the contributions of the predicted active signatures are estimated using a context-weighted non-negative least squares (WNNLS) approach. This method incorporates mutation-type-specific weights to enhance robustness, particularly under conditions of low mutation counts or high noise levels.
-
-By integrating probabilistic prediction with constrained optimization, AMuSA provides a robust and scalable framework for accurate mutational signature assignment across diverse datasets and mutation categories.
-
 ## Installing AMuSA
 
 git clone git@github.com:Yangying400/AMuSA.git
