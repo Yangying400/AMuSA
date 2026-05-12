@@ -180,12 +180,15 @@ python -m AMuSA.main \
 ### Python usage (Run AMuSA directly in Python or Jupyter notebooks)
 
 from AMuSA.main import run_pipeline
+
 run_pipeline(
-    base_model_dir="models",
+    model_type="SBS",
     mutation_file="data/example_catalog.csv",
-    mutation_type="SBS",
     signature_file="data/ground.truth.syn.sigs.SBS96.csv",
-    output_dir="result"
+    base_model_dir="models",
+    output_dir="result",
+    cosine_threshold=0.9,
+    adaptive_threshold=0.02
 )
 
 ### Input Arguments
