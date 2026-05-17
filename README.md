@@ -133,11 +133,9 @@ run_pipeline(
 | cosine_threshold | Float | Threshold for identifying low-confidence samples based on cosine similarity. Default: `0.9` |
 | adaptive_filtering_threshold | Float | Threshold used during refinement to filter weak signature contributions. Default: `0.02` |
 
-```
 
----
+
 ### Workflow
-
 <p align="center">
   <img src="figure/workflow.png" width="900">
 </p>
