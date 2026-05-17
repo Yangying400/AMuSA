@@ -115,7 +115,7 @@ from AMuSA.main import run_pipeline
 run_pipeline(
     base_model_dir="models",
     mutation_file="data/example_catalog.csv",
-    sig_file ="data/ground.truth.syn.sigs.SBS96.csv"
+    sig_file ="data/ground.truth.syn.sigs.SBS96.csv",
     mutation_type="SBS",
     output_dir="result"
 )
@@ -135,8 +135,7 @@ run_pipeline(
 
 ```
 
-
-
+---
 ### Workflow
 
 <p align="center">
