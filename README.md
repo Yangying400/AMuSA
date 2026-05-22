@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="figure/AMuSA.png" width="900">
+  <img src="figure/AMuSA.png" width="1000">
 </p>
 
 # AMuSA
@@ -136,5 +136,5 @@ run_pipeline(
 
 ### Workflow
 <p align="center">
-  <img src="figure/workflow.png" width="900">
+  <img src="figure/workflow.png" width="1000">
 </p>
