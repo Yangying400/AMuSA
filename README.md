@@ -37,10 +37,9 @@ cd AMuSA
 ### System Requirements
 
 - Python ≥ 3.10
-- CUDA 12.4 (recommended for GPU acceleration)
-- PyTorch ≥ 2.5.1 (GPU version recommended)
+- CUDA 12.4 
+- PyTorch ≥ 2.5.1 
 
-GPU acceleration is recommended for model training and large-scale mutational signature analysis. CPU-only mode is also supported but may be significantly slower.
 
 
 
@@ -89,7 +88,7 @@ Although AMuSA contains three modules, users only need to run one command:
 - **(2) Signature classification**  
   Estimates the probability of activation for each mutational signature.
 
-- **(3) Channel-weighted NNLS refinement (W-NNLS)**  
+- **(3) weighted NNLS refinement (WNNLS)**  
   Refines signature exposures using channel-aware weighting to reduce bias.
 
 ---
@@ -131,9 +130,9 @@ run_pipeline(
 | signature_file | String | Path to the reference or ground-truth signature file. Default: `data/ground.truth.syn.sigs.SBS96.csv` |
 | output_dir | String | Path to the output directory where results will be saved. Default: `result/` |
 | cosine_threshold | Float | Threshold for identifying low-confidence samples based on cosine similarity. Default: `0.9` |
-| adaptive_filtering_threshold | Float | Threshold used during refinement to filter weak signature contributions. Default: `0.02` |
-
-
+| filtering_threshold | Float | Threshold used during refinement to filter weak signature contributions. Default: `0.02` |
+| refine_thresholds | Float | Threshold used during refinement step to control signature selection sensitivity. Default: `0.1` |
+| max_active_signatures | Integer | Maximum number of active signatures allowed in the decomposition. Default: `7` |
 
 ### Workflow
 <p align="center">
