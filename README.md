@@ -88,7 +88,7 @@ Although AMuSA contains three modules, users only need to run one command:
 - **(2) Signature classification**  
   Estimates the probability of activation for each mutational signature.
 
-- **(3) weighted NNLS refinement (WNNLS)**  
+- **(3) Weighted NNLS refinement (WNNLS)**  
   Refines signature exposures using channel-aware weighting to reduce bias.
 
 ---
