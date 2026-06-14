@@ -136,5 +136,5 @@ run_pipeline(
 
 ### Workflow
 <p align="center">
-  <img src="figure/workflow.png" width="1000">
+  <img src="figure/Workflow.png" width="1000">
 </p>
