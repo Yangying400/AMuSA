@@ -140,6 +140,7 @@ run_pipeline(
 | min_contribution | Float | Minimum contribution fraction required for a candidate signature to be retained during refinement. Default: `0.05` |
 | min_improvement | Float |Minimum increase in cosine similarity required for a refined solution to replace the initial assignment. Default: `SBS: 0.04; DBS: 0.04; ID: 0.03` |
 | max_active_signatures | Integer | Maximum number of active signatures allowed in the decomposition. Default: `7` |
+
 Note: The reference signature file and pretrained model must correspond to the selected mutation type (SBS, DBS, or ID). The default min_improvement is 0.04 for SBS and DBS and 0.03 for ID.
 ### Workflow
 <p align="center">
