@@ -4,11 +4,11 @@
 
 # AMuSA
 
-AMuSA (Autoencoder Mutational Signature Assignment) is a hybrid deep learning framework for mutational signature assignment. By integrating unsupervised autoencoder-based denoising with supervised classifier guidance, AMuSA overcomes limitations of conventional linear refitting approaches and improves the accuracy of signature identification and exposure estimation.
+AMuSA (Autoencoder-driven Mutational Signature Assignment) is a hybrid deep learning framework for assigning known mutational signatures to genomic samples. It combines autoencoder-based representation learning with supervised signature prediction to identify active mutational signatures from mutation count matrices.
 
-The framework incorporates a dynamic channel-weighting mechanism to reduce bias introduced by dominant signatures, enabling accurate and joint inference of single base substitution (SBS), insertion–deletion (ID), and doublet base substitution (DBS) signatures.
+AMuSA first extracts informative features from mutational profiles and predicts the signatures likely to be active in each sample. Signature exposures are then estimated using non-negative least squares (NNLS), followed by an iterative refinement procedure for samples with suboptimal reconstruction.
 
-Given mutation count matrices derived from sequencing data, AMuSA predicts active mutational signatures and estimates their quantitative contributions across genomic samples.
+AMuSA supports single base substitution (SBS), doublet base substitution (DBS), and small insertion and deletion (ID) signatures. Given a mutation count matrix and a reference signature matrix, the framework outputs the predicted active signatures and their estimated exposures for each sample.
 
 ## Installation
 
@@ -74,7 +74,7 @@ pip install -e .
 
 ## Usage
 
-AMuSA is an  mutational signature assignment pipeline. It integrates three internal modules, but runs as a single unified process without requiring step-by-step execution.
+AMuSA is a mutational signature assignment pipeline that integrates three core modules into a single unified workflow, without requiring step-by-step execution.
 
 ---
 
@@ -83,13 +83,12 @@ AMuSA is an  mutational signature assignment pipeline. It integrates three inter
 Although AMuSA contains three modules, users only need to run one command:
 
 - **(1) Autoencoder-based representation learning**  
-  Learns a denoised latent representation from mutation count matrices.
-
+  Extracts key information from mutation count matrices into a latent representation.
 - **(2) Signature classification**  
   Estimates the probability of activation for each mutational signature.
 
-- **(3) Weighted NNLS refinement (WNNLS)**  
-  Refines signature exposures using channel-aware weighting to reduce bias.
+- **(3)NNLS refinement (NNLS)**  
+  Estimates mutational signature exposures using non-negative least squares (NNLS).
 
 ---
 
@@ -102,6 +101,10 @@ python -m AMuSA.main \
   --sig_file data/ground.truth.syn.sigs.SBS96.csv\
   --type SBS \
   --output_dir result
+  --cosine_threshold 0.95
+  --probability_threshold 0.05
+  --min_contribution 0.05
+  --min_improvement 0.04
 ```
 
 ---
@@ -114,11 +117,14 @@ from AMuSA.main import run_pipeline
 run_pipeline(
     base_model_dir="models",
     mutation_file="data/example_catalog.csv",
-    sig_file ="data/ground.truth.syn.sigs.SBS96.csv",
-    mutation_type="SBS",
-    output_dir="result"
-)
-
+    signature_file="data/ground.truth.syn.sigs.SBS96.csv",
+    model_type="SBS",
+    output_dir="result",
+    cosine_threshold=0.95,
+    probability_threshold=0.05,
+    min_contribution=0.05,
+    min_improvement=0.04,
+   )
 ```
 ---
 ## Main Parameters
@@ -129,11 +135,12 @@ run_pipeline(
 | type | String | Type of mutational signatures used in the analysis (e.g., SBS). Default: `SBS` |
 | signature_file | String | Path to the reference or ground-truth signature file. Default: `data/ground.truth.syn.sigs.SBS96.csv` |
 | output_dir | String | Path to the output directory where results will be saved. Default: `result/` |
-| cosine_threshold | Float | Threshold for identifying low-confidence samples based on cosine similarity. Default: `0.9` |
-| filtering_threshold | Float | Threshold used during refinement to filter weak signature contributions. Default: `0.02` |
-| refine_thresholds | Float | Threshold used during refinement step to control signature selection sensitivity. Default: `0.1` |
+| cosine_threshold | Float | Reconstruction cosine similarity threshold used to identify samples requiring refinement. Samples below this threshold enter the refinement step. Default: `0.95` |
+| probability_threshold | Float | Minimum predicted probability required for an unselected signature to enter the candidate pool during refinement. Default: `0.02` |
+| min_contribution | Float | Minimum contribution fraction required for a candidate signature to be retained during refinement. Default: `0.05` |
+| min_improvement | Float |Minimum increase in cosine similarity required for a refined solution to replace the initial assignment. Default: `SBS: 0.04; DBS: 0.04; ID: 0.03` |
 | max_active_signatures | Integer | Maximum number of active signatures allowed in the decomposition. Default: `7` |
-
+Note: The reference signature file and pretrained model must correspond to the selected mutation type (SBS, DBS, or ID). The default min_improvement is 0.04 for SBS and DBS and 0.03 for ID.
 ### Workflow
 <p align="center">
   <img src="figure/Workflow.png" width="1000">
