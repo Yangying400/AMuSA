@@ -34,10 +34,40 @@ Mutational signatures reflect the underlying biological processes that generate 
 Recent large-scale sequencing projects have cataloged numerous mutational signatures across different cancer types. Computational methods have therefore become essential tools for decomposing mutation profiles into combinations of mutational signatures.
 
 ## Overview of AMuSA
-AMuSA (Autoencoder Mutational Signature Assignment) is a hybrid deep learning framework that integrates unsupervised autoencoder-based denoising with supervised classifier guidance, thereby overcoming the limitations of conventional linear refitting approaches. Furthermore, AMuSA enab accurate and joint inference of single base substitution, insertion–deletion, and doublet base substitution signatures.
-AMuSA (Autoencoder Mutational Signature Assignment) is a computational framework designed to identify active mutational signatures and estimate their quantitative contributions in genomic samples. Given a mutation count matrix derived from sequencing data, AMuSA predicts which mutational signatures are active in each sample and subsequently estimates their exposure levels.
-The framework supports multiple mutation categories, including single base substitutions (SBS), doublet base substitutions (DBS), and small insertions and deletions (ID). The analysis can therefore be applied to different types of mutational signature datasets.
+AMuSA (Autoencoder-driven Mutational Signature Assignment) is a hybrid deep learning framework for assigning known mutational signatures to genomic samples. It combines autoencoder-based representation learning with supervised signature prediction to identify active mutational signatures from mutation count matrices.
 
+AMuSA first extracts informative features from mutational profiles and predicts the signatures likely to be active in each sample. Signature exposures are then estimated using non-negative least squares (NNLS), followed by an iterative refinement procedure for samples with suboptimal reconstruction.
+
+AMuSA supports single base substitution (SBS), doublet base substitution (DBS), and small insertion and deletion (ID) signatures. Given a mutation count matrix and a reference signature matrix, the framework outputs the predicted active signatures and their estimated exposures for each sample.
+
+## Quick Start
+
+AMuSA requires:
+- a mutation count matrix;
+- a reference signature matrix;
+- pretrained AMuSA models corresponding to the selected mutation type.
+
+Example:
+```bash
+python -m AMuSA.main \
+  --base_model_dir models \
+  --mutation_file data/example_catalog.csv \
+  --signature_file data/ground.truth.syn.sigs.SBS96.csv \
+  --type SBS \
+  --output_dir result \
+  --cosine_threshold 0.95 \
+  --probability_threshold 0.05 \
+  --min_contribution 0.05 \
+  --min_improvement 0.04 \
+  --max_active_signatures 7
+
+Pretrained models are provided separately for SBS, DBS and ID analyses. The selected model must correspond to the mutation type specified by --type.
+models/
+├── SBS/
+├── DBS/
+└── ID/
+
+The reference signature matrix must contain signatures compatible with the pretrained model used for the selected mutation type.
 
 # Data Preprocessing
 
@@ -190,40 +220,77 @@ python -m AMuSA.main \
 ### Python usage (Run AMuSA directly in Python or Jupyter notebooks)
 
 from AMuSA.main import run_pipeline
+
 run_pipeline(
     base_model_dir="models",
     mutation_file="data/example_catalog.csv",
-    mutation_type="SBS",
     signature_file="data/ground.truth.syn.sigs.SBS96.csv",
-    output_dir="result"
+    model_type="SBS",
+    output_dir="result",
+    cosine_threshold=0.95,
+    probability_threshold=0.05,
+    min_contribution=0.05,
+    min_improvement=0.04,
+    max_active_signatures=7,
 )
 
 ### Input Arguments
 
-Model and input settings
---base_model_dir
-Path to the directory containing the pretrained AMuSA models.
-Default: models/
---mutation_file
-Path to the mutation catalog file for signature analysis.
-Default: data/example_catalog.csv
---type
-Type of mutational signatures used in the analysis (e.g., SBS).
-Default: SBS
---signature_file
-Path to the reference or ground-truth signature file.
-Default: data/ground.truth.syn.sigs.SBS96.csv  
---cosine_threshold 
-controls the cutoff for identifying low-confidence samples based on cosine similarity (default: 0.9)
---adaptive_threshold
-is used during refinement to filter weak signature contributions (default: 0.02).
+#### Model and input settings
+
+**`--base_model_dir`**  
+Path to the parent directory containing the pretrained AMuSA models for SBS, DBS, and ID analyses.  
+Example: `models/`
+
+**`--mutation_file`**  
+Path to the mutation count matrix used for mutational signature assignment.  
+Example: `data/example_catalog.csv`
+
+**`--type`**  
+Mutation type used for the analysis. Supported values are `SBS`, `DBS`, and `ID`.  
+Example: `SBS`
+
+**`--signature_file`**  
+Path to the reference mutational signature matrix corresponding to the selected mutation type.  
+Example: `data/ground.truth.syn.sigs.SBS96.csv`
+
+**`--output_dir`**  
+Directory in which the analysis results will be saved.  
+Example: `result/`
+
+#### Refinement settings
+
+**`--cosine_threshold`**  
+Cosine similarity threshold used to identify samples requiring further refinement. Samples with reconstruction cosine similarity below this threshold are selected for refinement.  
+Default: `0.95`
+
+**`--probability_threshold`**  
+Minimum predicted probability required for an unselected signature to enter the candidate pool during refinement.  
+Default: `0.05`
+
+**`--min_contribution`**  
+Minimum contribution fraction required for a signature to be retained in the refined solution.  
+Default: `0.05`
+
+**`--min_improvement`**  
+Minimum improvement in cosine similarity required to accept the refined assignment.  
+Default: `0.04` for SBS, `0.04` for DBS, and `0.03` for ID.
+
+**`--max_active_signatures`**  
+Maximum number of active signatures allowed in the final assignment for each sample.  
+Default: `7`
 
 ### Pipeline Overview
-AMuSA performs mutational signature assignment through a multi-step pipeline. 
-First, an ensemble of pretrained autoencoder-based models and signature classifiers is used to predict signature activation probabilities for each sample. These probabilities are then converted into binary activation states using learned signature-specific thresholds (Step 1). 
-Next, active signatures are used to estimate exposure levels through a channel-weighted non-negative least squares (WNNLS) , and reconstruction quality is assessed using cosine similarity (Step 2). 
-Samples with cosine similarity below 0.9 are considered low-confidence cases and are reprocessed in a refinement stage. In this step, activation thresholds are adjusted to allow more candidate signatures, and a biological linkage rule is applied to enforce co-activation among related signatures. Exposure levels are then re-estimated using a channel-weighted non-negative least squares (WNNLS) approach, followed by a 2% filtering step to remove weak contributions before final normalization and reintegration with high-confidence samples.(Step 3–4)
-Finally, refined results from low-confidence samples are reintegrated with high-confidence results to generate the final exposure matrix (Step 5).
+
+AMuSA performs mutational signature assignment through a multi-step pipeline.
+
+First, an ensemble of pretrained autoencoder-based models and signature classifiers is used to predict the activation probability of each mutational signature for every sample. These probabilities are converted into binary activation states using signature-specific decision thresholds to obtain the initial set of active signatures (Step 1).
+
+Next, the exposures of the predicted active signatures are estimated using non-negative least squares (NNLS). Reconstruction quality is then evaluated by calculating the cosine similarity between the observed and reconstructed mutation profiles (Step 2).
+
+Samples with reconstruction cosine similarity below 0.95 are selected for further refinement. During refinement, additional candidate signatures are considered based on their predicted probabilities, and their exposures are re-estimated using NNLS. The refined assignment is accepted only when it improves the reconstruction cosine similarity by at least the predefined minimum threshold (Step 3–4).
+
+Finally, accepted refined assignments are used to replace the corresponding initial results, whereas samples without sufficient improvement retain their original assignments. The resulting predictions and exposure estimates are saved as the final AMuSA outputs (Step 5).
 
 ### output
 
@@ -287,8 +354,8 @@ Binary assignment of signatures (active = 1, inactive = 0) based on thresholds.
 
 These outputs are used as inputs for the subsequent exposure estimation step.
 
-#### 4.initial_exposure exposure  (WNNLS)
-initial_exposure refers to the raw signature exposure matrix estimated in Step 3 using WNNLS based on the predicted active signatures before any refinement.
+#### 4.initial_exposure exposure  (NNLS)
+initial_exposure refers to the raw signature exposure matrix estimated in Step 3 using NNLS based on the predicted active signatures before any refinement.
 
 **Example:**
 
@@ -302,18 +369,34 @@ initial_exposure refers to the raw signature exposure matrix estimated in Step 3
 | ...       | ...                | ...                 | ...                    |
 | SBS60     | 0                  | 0                   | 0                      |
 
-#### low_cosine_catalog_file  (Cosine Similarity) 
-To evaluate reconstruction quality, cosine similarity is computed between the reconstructed mutation catalog and the ground-truth catalog. This score reflects the reliability of exposure estimation for each sample and provides a confidence measure for downstream refinement. Samples with low cosine similarity are selected for further reprocessing in subsequent steps.
+#### low_cosine_catalog_file (Cosine Similarity)
+
+To assess reconstruction quality, cosine similarity is calculated between the observed and reconstructed mutation catalogs for each sample. Samples with cosine similarity below the predefined threshold are selected for further refinement. The corresponding mutation catalogs are saved in `low_cosine_catalog_file`.
 
 #### Refinement (low_cosine_predictions)
 
-To further improve robustness, AMuSA includes an optional refinement strategy for low-confidence samples. Samples with low reconstruction quality (cosine similarity < 0.9) are considered unstable and are selected for reprocessing. These samples undergo a second-pass prediction using the ensemble model to update signature activation probabilities under relaxed constraints.
-#### Refinement (refined_exposure_df)
+Samples with reconstruction cosine similarity below 0.95 are subjected to further refinement. During this step, additional candidate signatures are considered based on their predicted probabilities, generating an updated set of signature predictions for these samples.
 
-For low-confidence samples (cosine similarity < 0.9), exposure values are recalculated using updated signature predictions from the refinement stage. The refined exposures are obtained using a second-pass WNNLS estimation with adaptive filtering and are then normalized before being reintegrated with high-confidence results to form the final exposure matrix.
-#### final_exposure
+#### Refinement (refined_exposure)
 
-final_exposure is the final signature exposure matrix obtained by replacing the exposures of low-confidence samples with their refined estimates while keeping high-confidence samples unchanged, resulting in a complete and corrected exposure matrix across all samples.
+Based on the refined signature predictions, signature exposures are re-estimated using non-negative least squares (NNLS). The refined results are retained only when the reconstruction cosine similarity improves by at least the predefined minimum threshold.
+
+#### Final Exposure
+
+The final exposure matrix is generated by replacing the initial exposures only for samples that show sufficient improvement after refinement. Samples without sufficient improvement retain their original exposure estimates.
+### Output Files
+
+After the AMuSA pipeline is completed, the final results are saved under:
+
+```text
+<output_dir>/
+└── results/
+    └── <mutation_type>/
+        ├── <mutation_type>_replaced_predictions.csv
+        ├── <mutation_type>_replaced_exposure_float.csv
+        └── <mutation_type>_replaced_exposure.csv
+
+
 
 # Visualization and Interpretation
 
