@@ -60,12 +60,13 @@ python -m AMuSA.main \
   --min_contribution 0.05 \
   --min_improvement 0.04 \
   --max_active_signatures 7
-
+```
 Pretrained models are provided separately for SBS, DBS and ID analyses. The selected model must correspond to the mutation type specified by --type.
+
 models/
-├── SBS/
-├── DBS/
-└── ID/
+├── SBS_models/
+├── DBS_models/
+└── ID_models/
 
 The reference signature matrix must contain signatures compatible with the pretrained model used for the selected mutation type.
 
