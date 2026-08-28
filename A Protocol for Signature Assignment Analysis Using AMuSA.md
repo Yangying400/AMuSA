@@ -1,7 +1,7 @@
 ---
 title: "A Protocol for Signature Assignment Analysis Using AMuSA"
 author: "yy"
-date: "2026-05-09"
+date: "2026-08-29"
 output:
   word_document:
     toc: true
@@ -123,7 +123,7 @@ AMuSA uses reference mutational signatures for signature assignment. Reference s
 
 ## Reference Signature Matrix
 
-The reference signature file should be provided as a matrix of mutation probabilities, where each row corresponds to a mutation context and each column corresponds to a mutational signature.
+AMuSA uses the reference mutational signatures included in the corresponding pretrained model for signature assignment. For SBS, DBS, and ID analyses, only signatures that were used during AMuSA model training can be applied.
 
 Each signature column represents a probability distribution across mutation contexts and should sum to approximately 1.
 
@@ -187,7 +187,7 @@ Samples with suboptimal reconstruction are further evaluated through the refinem
 
 # Running AMuSA
 
-## Optional: Training New AMuSA Models
+## Optional: Training New Models
 
 Run this step only when a new model needs to be trained. If pretrained AMuSA models are available, this step can be skipped and the main AMuSA pipeline can be run directly.
 
@@ -267,7 +267,7 @@ run_pipeline(
     base_model_dir="models",
     mutation_file="data/example_catalog.csv",
     signature_file="data/ground.truth.syn.sigs.SBS96.csv",
-    model_type="SBS",
+    type="SBS",
     output_dir="result",
     cosine_threshold=0.95,
     probability_threshold=0.05,
@@ -276,9 +276,6 @@ run_pipeline(
     max_active_signatures=7,
 )
 ```
-
-Note that the command-line option is `--type`, whereas the corresponding Python argument for `run_pipeline()` is `model_type`.
-
 ## Input Arguments
 
 ### Model and Input Settings
@@ -349,7 +346,7 @@ The AMuSA pipeline generates intermediate prediction and exposure information th
 
 For each sample, the ensemble model produces an activation probability for every candidate signature.
 
-**Example:**
+**Probability Example:**
 
 | Signature | SP.Syn.Other::S.295 | SP.Syn.Kidney::S.187 | SP.Syn.Prostate::S.174 |
 |---|---:|---:|---:|
@@ -365,7 +362,7 @@ For each sample, the ensemble model produces an activation probability for every
 
 Signature-specific thresholds are used to convert predicted probabilities into binary activity predictions.
 
-**Example:**
+**Threshold Example:**
 
 | Signature | Threshold |
 |---|---:|
@@ -381,7 +378,7 @@ Signature-specific thresholds are used to convert predicted probabilities into b
 
 The thresholded predictions form a binary signature assignment matrix, where `1` indicates that a signature is assigned to a sample and `0` indicates that it is not assigned.
 
-**Example:**
+**Prediction Example:**
 
 | Signature | SP.Syn.Other::S.295 | SP.Syn.Kidney::S.187 | SP.Syn.Prostate::S.174 |
 |---|---:|---:|---:|
@@ -397,7 +394,7 @@ The thresholded predictions form a binary signature assignment matrix, where `1`
 
 Initial signature exposures are estimated in Step 2 using NNLS based on the predicted active signatures before refinement.
 
-**Example:**
+**Exposure Example:**
 
 | Signature | SP.Syn.Other::S.295 | SP.Syn.Kidney::S.187 | SP.Syn.Prostate::S.174 |
 |---|---:|---:|---:|
