@@ -100,6 +100,7 @@ python -m AMuSA.main \
   --mutation_file data/example_catalog.csv \
   --signature_file data/ground.truth.syn.sigs.SBS96.csv \
   --output_dir result
+```
 ---
 
 ### Run with custom parameters
@@ -115,6 +116,7 @@ python -m AMuSA.main \
   --min_contribution 0.05 \
   --min_improvement 0.04 \
   --max_active_signatures 7
+```
 ---
 
 ## Python (Jupyter Notebook)
@@ -128,6 +130,7 @@ run_pipeline(
     signature_file="data/ground.truth.syn.sigs.SBS96.csv",
     output_dir="result",
 )
+```
 ---
 
 ```markdown
@@ -147,7 +150,7 @@ run_pipeline(
     min_improvement=0.04,
     max_active_signatures=7,
 )
-
+```
 ## Main Parameters
 | Parameter | Variable Type | Parameter Description |
 |----------|--------------|----------------------|
