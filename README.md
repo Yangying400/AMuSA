@@ -92,47 +92,68 @@ Although AMuSA contains three modules, users only need to run one command:
 
 ---
 
-## Run AMuSA (bash)
+## Run AMuSA (Bash)
 
 ```bash
 python -m AMuSA.main \
-  --base_model_dir models \
-  --mutation_file data/example_catalog.csv \
-  --sig_file data/ground.truth.syn.sigs.SBS96.csv\
   --type SBS \
+  --mutation_file data/example_catalog.csv \
+  --signature_file data/ground.truth.syn.sigs.SBS96.csv \
   --output_dir result
-  --cosine_threshold 0.95
-  --probability_threshold 0.05
-  --min_contribution 0.05
-  --min_improvement 0.04
-```
-
 ---
 
-## Python  (jupyter notebook)
+### Run with custom parameters
+
+```bash
+python -m AMuSA.main \
+  --type SBS \
+  --mutation_file data/example_catalog.csv \
+  --signature_file data/ground.truth.syn.sigs.SBS96.csv \
+  --output_dir result \
+  --cosine_threshold 0.95 \
+  --probability_threshold 0.05 \
+  --min_contribution 0.05 \
+  --min_improvement 0.04 \
+  --max_active_signatures 7
+---
+
+## Python (Jupyter Notebook)
 
 ```python
-from AMuSA.main import run_pipeline
+from AMuSA import run_pipeline
 
 run_pipeline(
-    base_model_dir="models",
+    model_type="SBS",
     mutation_file="data/example_catalog.csv",
     signature_file="data/ground.truth.syn.sigs.SBS96.csv",
+    output_dir="result",
+)
+---
+
+```markdown
+### Run with custom parameters
+
+```python
+from AMuSA import run_pipeline
+
+run_pipeline(
     model_type="SBS",
+    mutation_file="data/example_catalog.csv",
+    signature_file="data/ground.truth.syn.sigs.SBS96.csv",
     output_dir="result",
     cosine_threshold=0.95,
     probability_threshold=0.05,
     min_contribution=0.05,
     min_improvement=0.04,
-   )
-```
----
+    max_active_signatures=7,
+)
+
 ## Main Parameters
 | Parameter | Variable Type | Parameter Description |
 |----------|--------------|----------------------|
-| base_model_dir | String | Path to the directory containing the pretrained AMuSA models. Default: `models/` |
+| `base_model_dir` | String, optional | Path to the pretrained AMuSA model directory. If omitted, AMuSA automatically uses the models bundled with the installed package. |
+| `--type` / `model_type` | String | Type of mutational signatures used in the analysis (e.g., SBS). Default: `SBS` |
 | mutation_file | String | Path to the mutation catalog file for signature analysis. Default: `data/example_catalog.csv` |
-| type | String | Type of mutational signatures used in the analysis (e.g., SBS). Default: `SBS` |
 | signature_file | String | Path to the reference or ground-truth signature file. Default: `data/ground.truth.syn.sigs.SBS96.csv` |
 | output_dir | String | Path to the output directory where results will be saved. Default: `result/` |
 | cosine_threshold | Float | Reconstruction cosine similarity threshold used to identify samples requiring refinement. Samples below this threshold enter the refinement step. Default: `0.95` |
