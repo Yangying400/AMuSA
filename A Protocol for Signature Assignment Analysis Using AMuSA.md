@@ -223,7 +223,6 @@ python -m AMuSA.main \
   --type SBS \
   --mutation_file data/example_catalog.csv \
   --signature_file data/ground.truth.syn.sigs.SBS96.csv \
-  --type SBS \
   --output_dir result \
  
 ```
