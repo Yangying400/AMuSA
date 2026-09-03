@@ -154,8 +154,8 @@ run_pipeline(
 ## Main Parameters
 | Parameter | Variable Type | Parameter Description |
 |----------|--------------|----------------------|
-| `base_model_dir` | String, optional | Path to the pretrained AMuSA model directory. If omitted, AMuSA automatically uses the models bundled with the installed package. |
-| `--type` / `model_type` | String | Type of mutational signatures used in the analysis (e.g., SBS). Default: `SBS` |
+| base_model_dir| String| Path to the pretrained AMuSA model directory. If omitted, AMuSA automatically uses the models bundled with the installed package. |
+| --type / model_type | String | Type of mutational signatures used in the analysis (e.g., SBS). Default: `SBS` |
 | mutation_file | String | Path to the mutation catalog file for signature analysis. Default: `data/example_catalog.csv` |
 | signature_file | String | Path to the reference or ground-truth signature file. Default: `data/ground.truth.syn.sigs.SBS96.csv` |
 | output_dir | String | Path to the output directory where results will be saved. Default: `result/` |
