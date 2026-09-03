@@ -55,36 +55,14 @@ Example for SBS analysis:
 
 ```bash
 python -m AMuSA.main \
-  --base_model_dir models \
+  --type SBS \
   --mutation_file data/example_catalog.csv \
   --signature_file data/ground.truth.syn.sigs.SBS96.csv \
   --type SBS \
   --output_dir result \
-  --cosine_threshold 0.95 \
-  --probability_threshold 0.05 \
-  --min_contribution 0.05 \
-  --min_improvement 0.04 \
-  --max_active_signatures 7
+  
 ```
 
-## Pretrained Models
-
-Pretrained models are provided separately for SBS, DBS, and ID analyses. The model directories are organized under the parent `models/` directory:
-
-```text
-models/
-├── SBS_models/
-├── DBS_models/
-└── ID_models/
-```
-
-The appropriate pretrained model is selected according to the mutation type specified by `--type`. Therefore, `--base_model_dir` should point to the parent model directory, for example:
-
-```bash
---base_model_dir models
-```
-
-The reference signature matrix must be compatible with the pretrained model used for the selected mutation type.
 
 # Data Preprocessing
 
@@ -242,16 +220,12 @@ Example for SBS analysis:
 
 ```bash
 python -m AMuSA.main \
-  --base_model_dir models \
+  --type SBS \
   --mutation_file data/example_catalog.csv \
   --signature_file data/ground.truth.syn.sigs.SBS96.csv \
   --type SBS \
   --output_dir result \
-  --cosine_threshold 0.95 \
-  --probability_threshold 0.05 \
-  --min_contribution 0.05 \
-  --min_improvement 0.04 \
-  --max_active_signatures 7
+ 
 ```
 
 For ID analysis, the default minimum improvement used in the current workflow is `0.03`; for SBS and DBS it is `0.04`.
@@ -261,46 +235,42 @@ For ID analysis, the default minimum improvement used in the current workflow is
 AMuSA can also be run directly from Python or a Jupyter notebook:
 
 ```python
-from AMuSA.main import run_pipeline
+from AMuSA import run_pipeline
 
 run_pipeline(
-    base_model_dir="models",
+    model_type="SBS",
     mutation_file="data/example_catalog.csv",
     signature_file="data/ground.truth.syn.sigs.SBS96.csv",
-    type="SBS",
     output_dir="result",
-    cosine_threshold=0.95,
-    probability_threshold=0.05,
-    min_contribution=0.05,
-    min_improvement=0.04,
-    max_active_signatures=7,
 )
 ```
 ## Input Arguments
 
+The following parameters are available for both command-line and Python execution.
+
 ### Model and Input Settings
 
-**`--base_model_dir`**  
-Path to the parent directory containing the pretrained AMuSA models for SBS, DBS, and ID analyses.  
-Example: `models/`
-
-**`--mutation_file`**  
-Path to the mutation count matrix used for mutational signature assignment.  
-Example: `data/example_catalog.csv`
-
-**`--type`**  
+**`model_type` / `--type`**  
 Mutation type used for the analysis. Supported values are `SBS`, `DBS`, and `ID`.  
 Example: `SBS`
 
-**`--signature_file`**  
-Path to the reference mutational signature matrix corresponding to the selected mutation type and pretrained model.  
+**`mutation_file` / `--mutation_file`**  
+Path to the mutation count matrix used for mutational signature assignment.  
+Example: `data/example_catalog.csv`
+
+**`signature_file` / `--signature_file`**  
+Path to the reference mutational signature matrix corresponding to the selected mutation type.  
 Example: `data/ground.truth.syn.sigs.SBS96.csv`
 
-**`--output_dir`**  
+**`output_dir` / `--output_dir`**  
 Directory in which AMuSA output files will be saved.  
 Example: `result/`
 
 ### Refinement Settings
+
+These parameters control the AMuSA refinement stage.
+Users can optionally modify these parameters according to specific analysis requirements.
+Default values are optimized for each mutation type.
 
 **`--cosine_threshold`**  
 Cosine similarity threshold used to identify samples requiring further refinement. Samples with reconstruction cosine similarity below this threshold are selected for refinement.  
